@@ -26,9 +26,16 @@ moviesRouter.post('/', async (request, response) => {
 moviesRouter.get('/', async (request, response) => {
   try {
     const moviesRepository = getRepository(Movie);
-    const { user_id } = request.body;
+    const { user_id, favorites } = request.body;
 
-    const movieList = await moviesRepository.find({ where: { user_id } });
+    let movieList = [];
+    if (favorites) {
+      movieList = await moviesRepository.find({
+        where: { user_id, is_favorite: true },
+      });
+    } else {
+      movieList = await moviesRepository.find({ where: { user_id } });
+    }
 
     return response.json(movieList);
   } catch (err) {
